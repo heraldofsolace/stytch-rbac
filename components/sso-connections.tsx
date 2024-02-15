@@ -13,7 +13,6 @@ export default async function SSOConnections({
         {
           organization_id: organization.organization_id,
         },
-        { authorization: { session_jwt: jwt } },
       );
     return (
         <Card className="w-full max-w-sm">

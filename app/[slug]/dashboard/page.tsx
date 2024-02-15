@@ -12,14 +12,9 @@ export default async function DashboardPage({
   const { organization, member, jwt } = await authenticate();
   return (
     <IsAuthenticated>
-      
-      {member.is_admin && (
-        <>
-          <SSOConnections organization={organization} jwt={jwt} />
-          <MembersList organization={organization} jwt={jwt} />
-        </>
-
-      )}
+  
+      <SSOConnections organization={organization} jwt={jwt} />
+      <MembersList organization={organization} jwt={jwt} />
       <div className="flex flex-col text-sm w-full max-w-sm p-2">
         <div>
           <span className="font-semibold">Organization name: </span>
