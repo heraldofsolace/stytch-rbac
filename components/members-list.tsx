@@ -20,9 +20,9 @@ export default async function MembersList({
           {members.map((member) => {
             return (
               <div key={member.member_id} className="flex justify-between">
+                <span>[{member.is_admin ? 'Admin' : 'Member'}]</span>
                 <span>{member.email_address}</span>
-                <span>{member.is_admin ? 'Admin' : 'Member'}</span>
-                <span>{member.status}</span>
+                <span>({member.status})</span>
               </div>
             );
           })
