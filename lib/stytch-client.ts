@@ -11,11 +11,27 @@ export async function authenticate() {
     const cookieStore = cookies();
     const jwt = cookieStore.get('stytch_session_jwt')?.value || '';
     const { organization, member } = await client.sessions.authenticate({
-      session_jwt: jwt,
+      session_jwt: jwt
     });
 
     return { organization, member, jwt };
   } catch (err) {
     redirect('/login');
+  }
+}
+
+export async function authorize(
+    authz_check: { organization_id: string, resource_id: string, action: string }) {
+  try {
+    const cookieStore = cookies();
+    const jwt = cookieStore.get('stytch_session_jwt')?.value || '';
+    const { organization, member } = await client.sessions.authenticate({
+      session_jwt: jwt,
+      authorization_check: authz_check,
+    });
+
+    return { organization, member, jwt, authorized: true };
+  } catch (err) {
+    return { authorized: false };
   }
 }

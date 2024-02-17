@@ -3,6 +3,7 @@ import IsAuthenticated from '@/components/is-authenticated';
 import { authenticate, client } from "@/lib/stytch-client";
 import MembersList from '@/components/members-list';
 import SSOConnections from '@/components/sso-connections';
+import Posts from '@/components/posts';
 
 export default async function DashboardPage({
   params,
@@ -12,9 +13,6 @@ export default async function DashboardPage({
   const { organization, member, jwt } = await authenticate();
   return (
     <IsAuthenticated>
-  
-      <SSOConnections organization={organization} jwt={jwt} />
-      <MembersList organization={organization} jwt={jwt} />
       <div className="flex flex-col text-sm w-full max-w-sm p-2">
         <div>
           <span className="font-semibold">Organization name: </span>
@@ -35,6 +33,9 @@ export default async function DashboardPage({
           </span>
         </div>
       </div>
+      <SSOConnections organization={organization} jwt={jwt} />
+      <MembersList organization={organization} jwt={jwt} />
+      <Posts organization={organization} jwt={jwt} />
     </IsAuthenticated>
   );
 }
