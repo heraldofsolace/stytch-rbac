@@ -8,9 +8,6 @@ export async function POST(request: Request) {
       organization_id: organization.organization_id,
       display_name: body.display_name,
     },
-    {
-      authorization: { session_jwt: jwt },
-    }
   );
 
   if (connection) {
@@ -24,9 +21,6 @@ export async function POST(request: Request) {
           connection.connection_id,
         ],
       },
-      {
-        authorization: { session_jwt: jwt },
-      }
     );
 
     return Response.json({ connection });
@@ -43,9 +37,6 @@ export async function PUT(request: Request) {
         organization_id: organization.organization_id,
         ...body,
         },
-        {
-        authorization: { session_jwt: jwt },
-        }
     );
 
     return Response.json({ connection });
