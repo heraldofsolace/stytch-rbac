@@ -1,4 +1,4 @@
-import IsAuthenticated from '@/components/is-authenticated';
+import Authenticated from '@/components/authenticated';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { authenticate, client } from '@/lib/stytch-client';
 import { redirect } from 'next/navigation';
@@ -22,7 +22,7 @@ export default async function ConnectionPage({
   }
 
   return (
-    <IsAuthenticated>
+    <Authenticated>
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle>Edit SAML SSO Connection</CardTitle>
@@ -36,6 +36,6 @@ export default async function ConnectionPage({
         </CardContent>
 
       </Card>
-    </IsAuthenticated>
+    </Authenticated>
   );
 }

@@ -8,7 +8,7 @@ import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 
-export default function IsAuthenticated({ children }: { children: ReactNode }) {
+export default function Authenticated({ children }: { children: ReactNode }) {
   const { member, isInitialized: memberIsInitiated } = useStytchMember();
   const { session, isInitialized: sessionIsInitiated } =
     useStytchMemberSession();
