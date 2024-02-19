@@ -5,20 +5,31 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Post } from "@prisma/client";
-import { useStytchOrganization } from "@stytch/nextjs/b2b";
+import { useStytchIsAuthorized, useStytchOrganization } from "@stytch/nextjs/b2b";
 import moment from "moment";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Post({ params }: { params: { id: string } }) {
   const [post, setPost] = useState<Post>();
   const [loading, setLoading] = useState(true);
-
+  const router = useRouter();
+  
   const { organization, isInitialized } = useStytchOrganization();
+
+  const { isAuthorized: authorizedToEdit } = useStytchIsAuthorized('post', 'update');
+  const { isAuthorized: authorizedToDelete } = useStytchIsAuthorized('post', 'delete');
+
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
-      const { post } = await fetch(`/api/posts/${params.id}`).then((res) => res.json());
-      setPost(post);
+      const { post, success, message } = await fetch(`/api/posts/${params.id}?organization_id=${organization?.organization_id}`).then((res) => res.json());
+      if(success)
+        setPost(post);
+      else if (message === 'Unauthorized') {
+        alert("You're not allowed to view this post");
+        router.push(`/${organization?.organization_slug}/dashboard`);
+      }
       setLoading(false);
     };
 
@@ -41,11 +52,13 @@ export default function Post({ params }: { params: { id: string } }) {
                     {post.content}
                   </p>
                   <Separator className="my-8" />
-                  <Button className="mr-2" onClick={() => window.location.href=`/posts/${post.id}/edit`}>Edit</Button>
+
+                  <Button className="mr-2" onClick={() => window.location.href=`/posts/${post.id}/edit`} disabled={!authorizedToEdit}>Edit</Button>
                   <Button className="mr-2" onClick={async () => {
-                    await fetch(`/api/posts/${post.id}`, { method: 'DELETE' });
-                    window.location.href = `/${organization.organization_slug}/dashboard`;
-                  }}>Delete</Button>
+                    const { success, message } = await fetch(`/api/posts/${post.id}?organization_id=${organization.organization_id}`, { method: 'DELETE' }).then(res => res.json());
+                    if(!success) return alert(message);
+                    router.push(`/${organization.organization_slug}/dashboard`);
+                  }} disabled={!authorizedToDelete}>Delete</Button>
                   <Button onClick={() => window.location.href=`/${organization.organization_slug}/dashboard`}>Back to dashboard</Button>
                 </CardContent>
               </Card>

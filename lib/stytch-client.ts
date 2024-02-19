@@ -29,9 +29,9 @@ export async function authorize(
       session_jwt: jwt,
       authorization_check: authz_check,
     });
-
     return { organization, member, jwt, authorized: true };
   } catch (err) {
-    return { authorized: false };
+    console.error(err);
+    return { organization: null, member: null, jwt: null, authorized: false };
   }
 }

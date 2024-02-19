@@ -9,6 +9,8 @@ export default async function MembersList({
 }: { organization: Organization, jwt: string }) {
     const { members } = await client.organizations.members.search({
         organization_ids: [organization.organization_id],
+      }, {
+        authorization: { session_jwt: jwt },
       });
 
     return (

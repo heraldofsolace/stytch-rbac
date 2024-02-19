@@ -9,12 +9,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Post } from "@prisma/client";
 import { useStytchOrganization } from "@stytch/nextjs/b2b";
-import moment from "moment";
-import { useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     title: z.string(),
@@ -26,16 +25,17 @@ export default function Post({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(true);
 
   const { organization, isInitialized } = useStytchOrganization();
+  const router = useRouter();
   useEffect(() => {
     setLoading(true);
     const fetchData = async () => {
-      const { post } = await fetch(`/api/posts/${params.id}`).then((res) => res.json());
+      const { post } = await fetch(`/api/posts/${params.id}?organization_id=${organization?.organization_id}`).then((res) => res.json());
       setPost(post);
       setLoading(false);
     };
-
-    fetchData();
-  }, []);
+    if(isInitialized)
+        fetchData();
+  }, [isInitialized]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -46,14 +46,18 @@ export default function Post({ params }: { params: { id: string } }) {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const response = await fetch(`/api/posts/${params.id}`, {
+    const response = await fetch(`/api/posts/${params.id}?organization_id=${organization?.organization_id}`, {
       method: 'PUT',
       body: JSON.stringify(values)
     });
-    const data = await response.json();
-    if(!data.success) return alert('Error creating post');
-    setPost(data.post);
-    window.location.href = `/posts/${params.id}`;
+    const { success, post, message } = await response.json();
+    if(success) 
+        setPost(post);
+    else if(message === 'Unauthorized') {
+        alert("You're not allowed to update this post");
+        router.push(`/${organization?.organization_slug}/dashboard`);
+    }
+    router.push(`/posts/${params.id}`);
     form.reset();
   }
 

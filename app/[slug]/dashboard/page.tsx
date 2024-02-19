@@ -33,8 +33,8 @@ export default async function DashboardPage({
           </span>
         </div>
       </div>
-      <SSOConnections organization={organization} jwt={jwt} />
-      <MembersList organization={organization} jwt={jwt} />
+      {member.is_admin && <SSOConnections organization={organization} jwt={jwt} />}
+      {member.is_admin && <MembersList organization={organization} jwt={jwt} />}
       <Posts organization={organization} jwt={jwt} />
     </Authenticated>
   );

@@ -19,6 +19,7 @@ import Link from 'next/link';
 const formSchema = z.object({
   title: z.string(),
   content: z.string(),
+  organization_id: z.string(),
 });
 
 
@@ -26,12 +27,14 @@ export default function Posts({
     organization, jwt
 }: { organization: Organization, jwt: string }) {
     const [posts, setPosts] = useState<Post[]>([]);
+    
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await fetch('/api/posts');
+          const response = await fetch(`/api/posts?organization_id=${organization.organization_id}`);
           const data = await response.json();
-          setPosts(data.posts);
+          if(data.success)
+            setPosts(data.posts);
         } catch (error) {
           console.error('Error fetching posts:', error);
         }
@@ -45,6 +48,7 @@ export default function Posts({
       defaultValues: {
         title: '',
         content: '',
+        organization_id: organization.organization_id,
       },
     });
 

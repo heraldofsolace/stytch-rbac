@@ -9,7 +9,11 @@ export async function POST(request: NextRequest) {
         await client.magicLinks.email.invite(
             {
                 organization_id: organization.organization_id,
-                email_address: body.email
+                email_address: body.email,
+                roles: body.roles
+            },
+            {
+                authorization: { session_jwt: jwt }
             }
         )
         return Response.json({ success: true });

@@ -17,6 +17,7 @@ export default function SSOConnectionForm({
   canEdit: boolean;
 }) {
   const [loading, setLoading] = useState(false);
+  const [roleAssignments, setRoleAssignments] = useState<{group: string, role_id: string}[]>(connection.saml_group_implicit_role_assignments || []);
   const router = useRouter();
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     setLoading(true);
@@ -34,9 +35,11 @@ export default function SSOConnectionForm({
             email: formData.get('email_attribute') as string,
             first_name: formData.get('first_name_attribute') as string,
             last_name: formData.get('last_name_attribute') as string,
+            groups: formData.get('groups_attribute') as string,
           },
           idp_entity_id: formData.get('idp_entity_id') as string,
           idp_sso_url: formData.get('idp_sso_url') as string,
+          saml_group_implicit_role_assignments: roleAssignments,
         }),
       });
 
@@ -154,6 +157,71 @@ export default function SSOConnectionForm({
           }
           disabled={!canEdit}
         />
+      </div>
+      <div>
+        <Label htmlFor="groups_attribute">Groups Attribute</Label>
+        <Input
+          type="text"
+          id="groups_attribute"
+          name="groups_attribute"
+          placeholder="groups"
+          defaultValue={
+            connection.attribute_mapping
+              ? connection.attribute_mapping['groups']
+              : ''
+          }
+          disabled={!canEdit}
+        />
+      </div>
+      <div>
+        <Label>Role Assignments</Label>
+        {roleAssignments.map((roleAssignment, index) => {
+          return (
+            <div className="flex gap-2 p-2">
+              <Input
+                type="text"
+                id="group"
+                name="group"
+                placeholder="Group"
+                value={roleAssignment.group}
+                onInput={(e) => {
+                  const newRoleAssignments = roleAssignments.map((r, i) => {
+                    if (i === index) {
+                      return { ...r, group: e.currentTarget.value };
+                    }
+                    return r;
+                  });
+                  setRoleAssignments(newRoleAssignments);
+                }}
+                disabled={!canEdit}
+              />
+              <Input
+                type="text"
+                id="role_id"
+                name="role_id"
+                placeholder="Role ID"
+                value={roleAssignment.role_id}
+                onInput={(e) => {
+                  const newRoleAssignments = roleAssignments.map((r, i) => {
+                    if (i === index) {
+                      return { ...r, role_id: e.currentTarget.value };
+                    }
+                    return r;
+                  });
+                  setRoleAssignments(newRoleAssignments);
+                }}
+                disabled={!canEdit}
+              />
+           <Button onClick={(e) => {
+            e.preventDefault();
+            setRoleAssignments(roleAssignments.filter((_, i) => i !== index))}}>Remove</Button>
+           </div>
+          )
+        })}
+        <Button className='block m-4' onClick={(e) => {
+          e.preventDefault();
+          setRoleAssignments([...roleAssignments, { group: '', role_id: '' }])}}>Add role assignment</Button>
+        
       </div>
       <div>
         <Label htmlFor="certificate">Signing Certificate</Label>
